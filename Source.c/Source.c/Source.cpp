@@ -37,8 +37,7 @@ int main()
 			fputc(c, fout);
 			continue;
 		}
-		c /= 2;
-		c *= 2;
+		if (c % 2) c--;
 		fputc((c+cipher[can++]), fout);
 	}
 
