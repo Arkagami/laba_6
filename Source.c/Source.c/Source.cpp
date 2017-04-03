@@ -31,9 +31,9 @@ int main()
 				cip /= 2;
 			}
 		}
-		if (feof(fcip)&&(end==2)) { 
-			fputc(c, fout); 
-			continue; 
+		if ((feof(fcip)) && (end == 2)) {
+			fputc(c, fout);
+			continue;
 		}
 		c /= 2;
 		c *= 2;
