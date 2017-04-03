@@ -12,7 +12,7 @@ int main()
 	fcip = fopen("input.txt", "r");
 	fout = fopen("Out.bmp", "wb");
 	unsigned char c = 0, cip = 0;
-	int can = 0, cipher[8];
+	int can = 0, cipher[8], end = 0;
 	for (int i = 0;i < 54;i++) {
 		c = fgetc(fin); fputc(c, fout);
 	}
@@ -21,15 +21,16 @@ int main()
 		if (feof(fin)) break;
 		if (feof(fcip)) {
 			cip = '#'; goto suda;
+			end = 1;
 		}
 		if (can %= 8, can == 0) {
 			cip = fgetc(fcip);
 		suda:;
-			if(cip == '#') goto tuda;
 			for (int i = 7; i >= 0; i--) {
 				cipher[i] = cip % 2;
 				cip /= 2;
 			}
+			if (end == 1) goto tuda;
 		}
 		can++;
 		if (feof(fcip)) { 
