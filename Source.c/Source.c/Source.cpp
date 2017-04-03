@@ -16,11 +16,10 @@ int main()
 	}
 	while (1) {
 		cip = 0;
-			for (int i = 7; i >= 0; i--) {
+			for (int i = 0; i < 8; i++) {
 				c = fgetc(fin);
 				cip = (cip * 2) + (c % 2);
 			}
-
 			if (cip == '#') break;
 		fputc(cip, fout);
 	}
