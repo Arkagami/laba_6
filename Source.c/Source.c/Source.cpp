@@ -19,6 +19,7 @@ int main()
 	while (1) {
 		c = fgetc(fin);
 		if (feof(fin)) break;
+		if ((can %= 8, can == 0) && (end == 1)) end=2;
 		if(end==0) if (can %= 8, can == 0) {
 			cip = fgetc(fcip);
 			if (feof(fcip)) {
@@ -29,13 +30,11 @@ int main()
 				cipher[i] = cip % 2;
 				cip /= 2;
 			}
-			if (end == 1) goto tuda;
 		}
-		if (feof(fcip)) { 
+		if (feof(fcip)&&(end==2)) { 
 			fputc(c, fout); 
 			continue; 
 		}
-	tuda:;
 		c /= 2;
 		c *= 2;
 		fputc((c+cipher[can++]), fout);
