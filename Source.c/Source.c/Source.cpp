@@ -28,8 +28,10 @@ int main()
 			}
 			for (int i = 7; i >= 0; i--) {
 				cipher[i] = cip % 2;
+				printf("%d", cipher[i]);
 				cip /= 2;
 			}
+			printf("\n");
 		}
 		if ((feof(fcip)) && (end == 2)) {
 			fputc(c, fout);
