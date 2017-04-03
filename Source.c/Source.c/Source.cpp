@@ -31,7 +31,6 @@ int main()
 			}
 			if (end == 1) goto tuda;
 		}
-		can++;
 		if (feof(fcip)) { 
 			fputc(c, fout); 
 			continue; 
@@ -39,7 +38,7 @@ int main()
 	tuda:;
 		c /= 2;
 		c *= 2;
-		fputc((c+cipher[8-can]), fout);
+		fputc((c+cipher[can++]), fout);
 	}
 
 	fclose(fin);
