@@ -19,13 +19,12 @@ int main()
 	while (1) {
 		c = fgetc(fin);
 		if (feof(fin)) break;
-		if (feof(fcip)) {
-			cip = '#'; goto suda;
-			end = 1;
-		}
-		if (can %= 8, can == 0) {
+		if(end==0) if (can %= 8, can == 0) {
 			cip = fgetc(fcip);
-		suda:;
+			if (feof(fcip)) {
+				cip = '#';
+				end = 1;
+			}
 			for (int i = 7; i >= 0; i--) {
 				cipher[i] = cip % 2;
 				cip /= 2;
