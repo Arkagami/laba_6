@@ -3,11 +3,6 @@
 #include <math.h>
 
 
-char cipher(char c, int i) {
-	return 0;
-}
-
-
 int main()
 {
 	FILE* fin;
@@ -16,20 +11,35 @@ int main()
 	fin = fopen("Mixno.bmp", "rb");
 	fcip = fopen("input.txt", "r");
 	fout = fopen("Out.bmp", "wb");
-	char c = 0, cip = 0;
-	int can = 0;
+	unsigned char c = 0, cip = 0;
+	int can = 0, cipher[8];
 	for (int i = 0;i < 54;i++) {
 		c = fgetc(fin); fputc(c, fout);
 	}
 	while (1) {
 		c = fgetc(fin);
-		if(can%=8,can==0) cip = fgetc(fcip);
-		can++;
-		c = cipher(c, cip / int(pow(2.0, 8.0 - double(can))));
 		if (feof(fin)) break;
-		if (feof(fcip)) cip = '#';
-
-		fputc(c, fout);
+		if (feof(fcip)) {
+			cip = '#'; goto suda;
+		}
+		if (can %= 8, can == 0) {
+			cip = fgetc(fcip);
+		suda:;
+			if(cip == '#') goto tuda;
+			for (int i = 7; i >= 0; i--) {
+				cipher[i] = cip % 2;
+				cip /= 2;
+			}
+		}
+		can++;
+		if (feof(fcip)) { 
+			fputc(c, fout); 
+			continue; 
+		}
+	tuda:;
+		c /= 2;
+		c *= 2;
+		fputc((c+cipher[8-can]), fout);
 	}
 
 	fclose(fin);
