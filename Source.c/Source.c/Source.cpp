@@ -20,6 +20,7 @@ int main()
 				c = fgetc(fin);
 				cip = (cip * 2) + (c % 2);
 			}
+			if (feof(fin)) break;
 			if (cip == '#') break;
 		fputc(cip, fout);
 	}
