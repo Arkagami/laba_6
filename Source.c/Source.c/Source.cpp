@@ -16,18 +16,15 @@ void decoder()
 	}
 	while (1) {
 		cip = 0;
+		int step = 128;
 		for (int i = 0; i < 8; i++) {
 			c = fgetc(fin);
-			cip = (cip * 2) + (c % 2);
+			cip += step * (c % 2);
+			step /= 2;
 		}
 		if (feof(fin)) break;
 		if (cip == '#') break;
 		fputc(cip, fout);
-	}
-	while (1) {
-		c = fgetc(fin);
-		if (feof(fin)) break;
-		fputc(c, fout);
 	}
 
 	fclose(fin);
@@ -57,18 +54,25 @@ void coder()
 				cip = '#';
 				end = 1;
 			}
-			for (int i = 7; i >= 0; i--) {
-				cipher[i] = cip % 2;
-				printf("%d", cipher[i]);
-				cip /= 2;
+			int ciphers[8], koli = 0, ii=0;
+			while (cip > 0) {
+				ciphers[ii] = cip % 2;
+				koli++;
+				cip = cip / 2;
+				ii++;
 			}
-			printf("\n");
+			for (int i = 0;i<8;i++) {
+				cipher[i] = 0;
+			}
+			for (int i = 0;i < koli;i++) {
+				cipher[i+8-koli] = ciphers[koli-1-i];
+			}
 		}
 		if ((feof(fcip)) && (end == 2)) {
 			fputc(c, fout);
 			continue;
 		}
-		if (c % 2 == 0) c--;
+		if (c % 2 == 1) c--;
 		fputc((c + cipher[can++]), fout);
 	}
 
@@ -80,6 +84,6 @@ void coder()
 int main()
 {
 	coder();
-	//decoder();
+	decoder();
 	return 0;
 }
