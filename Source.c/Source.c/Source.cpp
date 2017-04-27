@@ -1,7 +1,7 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
-#include <math.h>
 
+char s[100];
 
 void decoder()
 {
@@ -10,33 +10,49 @@ void decoder()
 	fin = fopen("Out.bmp", "rb");
 	fout = fopen("output.txt", "w");
 	unsigned char c = 0, cip = 0;
-	int can = 0, cipher[8];
-	for (int i = 0;i < 54;i++) {
+	int can = 0, cipher[8], d = 0;
+	for (int i = 0;i < 55;i++) {
 		c = fgetc(fin);
 	}
+	d = c % 8;
 	while (1) {
 		cip = 0;
+		c = fgetc(fin);
+		int stepen = 1;
+		for (int u = 0;u < d;u++) stepen *= 2;
+		int ii = 0;;
+	snova:
 		int step = 128;
-		for (int i = 0; i < 8; i++) {
-			c = fgetc(fin);
-			cip += step * (c % 2);
+		for (int i = ii; i < 8; i++) {
+			ii = i;
+			if ((i % d==0)&&(i!=0)) {
+				fputc(cip, fout);
+				printf("%c", cip);
+				cip = 0;
+				c = fgetc(fin);
+				if (feof(fin)) break;
+				if (cip == '#') goto all;
+				stepen = 1;
+				for (int u = 0;u < d;u++) stepen *= 2;
+			}
+			cip += step * (c % stepen);
 			step /= 2;
+			stepen /= 2;
 		}
-		if (feof(fin)) break;
-		if (cip == '#') break;
-		fputc(cip, fout);
+		goto snova;
+	all:;
 	}
 
 	fclose(fin);
 	fclose(fout);
 }
 
-void coder()
+void coder(int d)
 {
 	FILE* fin;
 	FILE* fcip;
 	FILE* fout;
-	fin = fopen("Mixno.bmp", "rb");
+	fin = fopen(s, "rb");
 	fcip = fopen("input.txt", "r");
 	fout = fopen("Out.bmp", "wb");
 	unsigned char c = 0, cip = 0;
@@ -44,6 +60,12 @@ void coder()
 	for (int i = 0;i < 54;i++) {
 		c = fgetc(fin); fputc(c, fout);
 	}
+
+
+	c = fgetc(fin);
+	c = c - (c % 8);
+	fputc(c+d, fout);
+
 	while (1) {
 		c = fgetc(fin);
 		if (feof(fin)) break;
@@ -72,8 +94,20 @@ void coder()
 			fputc(c, fout);
 			continue;
 		}
-		if (c % 2 == 1) c--;
-		fputc((c + cipher[can++]), fout);
+		int stepen = 1;
+		for (int u = 0; u < d; u++) {
+			stepen *= 2;
+		}
+		//if (c % stepen == 1) c--;
+		c /= stepen;
+		c *= stepen;
+		int outs = 0;
+		for (int u = 0; u < d; u++) {
+			outs += stepen*cipher[can++];
+			stepen /= 2;
+		}
+		c = c + outs;
+			fputc(c, fout);
 	}
 
 	fclose(fin);
@@ -83,7 +117,17 @@ void coder()
 
 int main()
 {
-	coder();
-	decoder();
+	int y = 0;
+	printf("0^1:");
+	scanf(" %d", &y);
+	if (y == 0) {
+		printf("name:");
+		scanf(" %s", &s);
+		printf("Stepen' shatiya:");
+		int d = 1;
+		scanf(" %d", &d);
+		coder(d);
+	}
+	if(y==1) decoder();
 	return 0;
 }
