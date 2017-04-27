@@ -18,26 +18,23 @@ void decoder()
 	while (1) {
 		cip = 0;
 		c = fgetc(fin);
-		int stepen = 1;
-		for (int u = 0;u < d;u++) stepen *= 2;
-		int ii = 0;;
+		int ii = 1;
+		int step = 1;
 	snova:
-		int step = 128;
-		for (int i = ii; i < 8; i++) {
-			ii = i;
-			if ((i % d==0)&&(i!=0)) {
+		for (int i = ii; i <= 8; i++) {
+			ii = (i % 8)+1;
+			cip += step * (c % 2);
+			c /= 2;
+			step *= 2;
+			if ((i % d == 0)) {
 				fputc(cip, fout);
 				printf("%c", cip);
 				cip = 0;
 				c = fgetc(fin);
 				if (feof(fin)) break;
 				if (cip == '#') goto all;
-				stepen = 1;
-				for (int u = 0;u < d;u++) stepen *= 2;
+				step = 1;
 			}
-			cip += step * (c % stepen);
-			step /= 2;
-			stepen /= 2;
 		}
 		goto snova;
 	all:;
