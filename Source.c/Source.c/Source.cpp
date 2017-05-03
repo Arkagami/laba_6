@@ -15,30 +15,29 @@ void decoder()
 		c = fgetc(fin);
 	}
 	d = c % 8;
+	printf("Stepen' shatiya:%d\n\n", d);
 	int stepen = 1;
 	for (int u = 0; u < d; u++) {
 		stepen *= 2;
 	}
-	int step = 1;
+	int step = 128;
+	cip = 0;
+	can = 0;
 	while (1) {
-		cip = 0;
 		c = fgetc(fin);
 		if (feof(fin)) break;
-		char cip = 0;
-			
-			c = c % stepen;
-			int outs = 0;
+
 			for (int u = 0; u < d; u++) {
 				can++;
-				cip += step*(c % 2);
-				step *= 2;
+				cip =cip + step*(c % 2);
+				step /= 2;
 				c /= 2;
 				if(can==8){
-					if (cip == '#') goto vihod;
+					if (cip == 7) goto vihod;
 					fputc(cip, fout);
 					printf("%c", cip);
 					cip = 0;
-					step = 1;
+					step = 128;
 					can = 0;
 				}
 			}
@@ -58,8 +57,17 @@ void coder(int d)
 	fcip = fopen("input.txt", "r");
 	fout = fopen("Out.bmp", "wb");
 	unsigned char c = 0, cip = 0;
-	int can = 0, cipher[8], end = 0;
-	for (int i = 0;i < 54;i++) {
+	int can = 0, cipher[8], end = 0, count = 0;
+	c = fgetc(fin); fputc(c, fout);
+	c = fgetc(fin); fputc(c, fout);
+	unsigned long size = 0;
+	fread(&size, 4, 1, fin);
+	fwrite(&size, 4, 1, fout);
+	printf("Size - %d\n", size);
+	count = (size - 56)*d / 8;
+	printf("max - %d\n", count);
+
+	for (int i = 0;i < 48;i++) {
 		c = fgetc(fin); fputc(c, fout);
 	}
 
@@ -68,58 +76,71 @@ void coder(int d)
 	c = c - (c % 8);
 	fputc(c+d, fout);
 	int	step = 1;
-	int outs = 0, news = 0;
+	int outs = 0;
+	int returns = 0;
+	goto mimo;
+//Здесь функция считывания из файла нового символа
+get_message:;
+	if (returns == 2) { returns = 0; goto next; }
+		cip = fgetc(fcip);
+		if ((count==0)&&(feof(fcip))) {
+			cip = 7;
+			returns = 2;
+		}
+		else { 
+		//printf("%c", cip); 
+		returns = 1; }
+		count--;
+		int ciphers[8], koli = 0, ii = 0;
+		while (cip > 0) {
+			ciphers[ii] = cip % 2;
+			koli++;
+			cip = cip / 2;
+			ii++;
+		}
+		for (int i = 0;i < 8;i++) {
+			cipher[i] = 0;
+		}
+		for (int i = 0;i < koli;i++) {
+			cipher[i + 8 - koli] = ciphers[koli - 1 - i];
+		}
+		can = 0;
+		goto next;
+//---------------------------------------------------
+	mimo:;
+
 	while (1) {
 		c = fgetc(fin);
 		if (feof(fin)) break;
-		if (news != 1) {
-			if ((can %= 8, can == 0) && (end == 1)) end = 2;
-			if (end == 0) if (can %= 8, can == 0) {
-			newq:;
-				cip = fgetc(fcip);
-				if (feof(fcip)) {
-					cip = '#';
-					end = 1;
-				}
-				int ciphers[8], koli = 0, ii = 0;
-				while (cip > 0) {
-					ciphers[ii] = cip % 2;
-					koli++;
-					cip = cip / 2;
-					ii++;
-				}
-				for (int i = 0;i < 8;i++) {
-					cipher[i] = 0;
-				}
-				for (int i = 0;i < koli;i++) {
-					cipher[i + 8 - koli] = ciphers[koli - 1 - i];
-				}
-				if (news == 1) { news = 0; goto obratno; }
-			}
-		}
-		if ((feof(fcip)) && (end == 2)) {
-			fputc(c, fout);
-			continue;
-		}
+
+		
 		int stepen = 1;
 		for (int u = 0; u < d; u++) {
 			stepen *= 2;
 		}
 		//if (c % stepen == 1) c--;
-		c = c - (c % stepen);
+		//c = c - (c % (stepen));
+		c /= stepen;
+		c *= stepen;
 		step = 1;
 		outs = 0;
 		for (int u = 0; u < d; u++) {
+			if (can %= 8, can == 0) {  goto get_message; }
+		next:;
+			if (returns == 0) { fputc(c + outs, fout); goto ext; }
 			outs += step*cipher[can++];
 			step *= 2;
-			if (can %= 8, (can == 0) && (can < d)) {
-				news = 1;
-				goto newq;
-			}
-		obratno:;
 		}
 		fputc(c + outs, fout);
 	}
+ext:;
+	while (!feof(fin)) {
+		c = fgetc(fin);
+		if (feof(fin)) break;
+		fputc(c, fout);
+	}
+
+	if (!feof(fcip)) printf("Message was been cutted.\n");
 
 	fclose(fin);
 	fclose(fcip);
@@ -128,17 +149,20 @@ void coder(int d)
 
 int main()
 {
-	int y = 0;
-	printf("0^1:");
-	scanf(" %d", &y);
-	if (y == 0) {
-		printf("name:");
-		scanf(" %s", &s);
-		printf("Stepen' shatiya:");
-		int d = 1;
-		scanf(" %d", &d);
-		coder(d);
+	while (1) {
+		int y = 0;
+		printf("0^1:");
+		scanf(" %d", &y);
+		if (y == 0) {
+			printf("name:");
+			scanf(" %s", &s);
+			printf("Stepen' shatiya:");
+			int d = 1;
+			scanf(" %d", &d);
+			coder(d);
+		}
+		if (y == 1) decoder();
+		printf("\n--------------------------------------------------------------------------------\n");
 	}
-	if(y==1) decoder();
 	return 0;
 }
